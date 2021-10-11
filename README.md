@@ -1,5 +1,4 @@
-# assist_app_ts
-Learning to make React applications on TS
+# Assist App
 React application created on TS
 
 Data Base - MongoDB
