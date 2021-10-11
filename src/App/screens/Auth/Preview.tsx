@@ -6,9 +6,12 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {OnboardingStackParamList} from '../RootStackPrams';
 import {TouchableOpacity} from 'react-native';
 import {RootState} from 'src/store/reducers/rootReduser';
-import {useSelector} from 'react-redux';
-import {getValueStorage} from '../../../storage/storage';
-// import axios from 'axios';
+import {useDispatch, useSelector} from 'react-redux';
+import {getValueStorage, removeItem} from '../../../storage/storage';
+import {Dispatch} from 'redux';
+import {fetchPersonalRequest} from '../../../store/actions/presonalActions/presonalActions';
+import {initWebSocket} from '../../../network/socket';
+import { visibleTabBar } from '../Main/MainScreen';
 const Wrapper = styled(View)`
   flex: 1;
   padding: 30px 0;
@@ -29,7 +32,7 @@ const TextCom = styled(Text)`
 `;
 
 const TextPress = styled(Text)`
-  color: ${props => props.theme.darkblue};
+  color: ${props => props.theme.black};
   font-size: 24px;
   text-align: center;
   padding-vertical: 14px;
@@ -41,8 +44,8 @@ const ImageComponent = styled(Image)`
 
 const Button = styled(TouchableOpacity)`
   margin-horizontal: 20px;
-  background-color: ${props => props.theme.blue};
-  border: 0 solid ${props => props.theme.white};
+  background-color: ${props => props.theme.white};
+  border: 0.5px solid ${props => props.theme.white};
   border-radius: 14px;
   margin-top: 30px;
 `;
@@ -55,6 +58,7 @@ type boardProps = StackNavigationProp<
 const Preview = () => {
   const navigation = useNavigation<boardProps>();
   const {themeMode} = useSelector((state: RootState) => state.themeMode);
+  const dispatch: Dispatch<any> = useDispatch();
   useEffect(() => {
     getValueStorage('tokenAuth').then(token => {
       if (!token) {
@@ -67,7 +71,13 @@ const Preview = () => {
         //   Authorization: 'Bearer ' + token,
         // };
         // axios.defaults.headers = headers;
-        navigation.navigate('Main');
+        getValueStorage('user_id').then((id: any) => {
+          console.log(id);
+          dispatch(fetchPersonalRequest(id));
+          // initWebSocket();
+          visibleTabBar(true);
+          navigation.navigate('Main');
+        });
       }
     });
   }, [navigation]);

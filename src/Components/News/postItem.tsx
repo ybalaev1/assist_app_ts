@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Image, Text, View} from 'react-native';
-import {getDateString} from '../../storage/moddleware';
+import {getDateString} from '../../storage/middleware';
 import styled from 'styled-components';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/reducers/rootReduser';
@@ -11,6 +11,7 @@ import {useEffect} from 'react';
 import {Dispatch} from 'redux';
 import {fetchPersonalRequest} from '../../store/actions/presonalActions/presonalActions';
 import {useNavigation} from '@react-navigation/native';
+import { TouchableHighlight } from 'react-native-gesture-handler';
 
 const UserWrapper = styled(TouchableOpacity)`
   flex-direction: row;
@@ -90,26 +91,32 @@ const ImageTouch = styled(TouchableOpacity)``;
 const IconWrapper = styled(TouchableOpacity)`
   margin-top: -16px;
 `;
+interface Props {
+  post: {
+    message: string;
+    image: string;
+    comments: string[];
+    likes: string[];
+    user: {
+      fullName: string;
+      image: string;
+    };
+    createdAt: number;
+  };
+  pending: boolean;
+  openModal: () => void;
+}
 
-const PostItem = (prop: {post: any; pending: boolean}) => {
+const PostItem = ({post, pending, openModal}: Props) => {
   const navigation = useNavigation();
+  const {message, image, comments, likes, user, createdAt} = post;
   const [fullScreen, setFull] = useState(false);
-  // const {user} = prop.post;
-  // const dispatch: Dispatch<any> = useDispatch();
-  // const {personal, pending} = useSelector(
-  //   (state: RootState) => state.personal,
-  //   shallowEqual,
-  // );
   const images = [
     {
-      uri: prop.post.image,
+      uri: image,
     },
   ];
-  // useEffect(() => {
-  //   dispatch(fetchPersonalRequest(user));
-  // }, [dispatch, user]);
-
-  const WrapperItem = styled(View)`
+  const WrapperItem = styled(TouchableOpacity)`
     flex: 1;
     padding: 14px 10px;
     background-color: ${props => props.theme.white};
@@ -121,64 +128,60 @@ const PostItem = (prop: {post: any; pending: boolean}) => {
     border-radius: 6px;
     margin-bottom: 6px;
   `;
-  // const renderBlockUser = () => {
-  //   return (
-  //     <HeadWrapper>
-  //       <UserWrapper onPress={() => console.log(prop.post)}>
-  //         <UserImage
-  //           source={
-  //             personal.image
-  //               ? {uri: personal.image}
-  //               : require('../../assets/images/person.png')
-  //           }
-  //         />
-  //         <WrapperName>
-  //           <UserName>{pending ? 'Loading ...' : personal.fullName}</UserName>
-  //           <Timistamp>{getDateString(prop.post.createdAt)}</Timistamp>
-  //         </WrapperName>
-  //       </UserWrapper>
-  //       <IconWrapper>
-  //         <IconI name={'move-h-a'} size={22} />
-  //       </IconWrapper>
-  //     </HeadWrapper>
-  //   );
-  // };
+  const renderBlockUser = () => {
+    return (
+      <HeadWrapper>
+        <UserWrapper onPress={() => console.log(post)}>
+          <UserImage
+            source={
+              user.image
+                ? {uri: user.image}
+                : require('../../assets/images/person.png')
+            }
+          />
+          <WrapperName>
+            <UserName>{pending ? 'Loading ...' : user.fullName}</UserName>
+            <Timistamp>{getDateString(createdAt)}</Timistamp>
+          </WrapperName>
+        </UserWrapper>
+        <IconWrapper onPress={openModal}>
+          <IconI name={'move-h-a'} size={22} />
+        </IconWrapper>
+      </HeadWrapper>
+    );
+  };
 
   return (
-    <WrapperItem>
+    <WrapperItem
+    onPress={() => navigation.navigate('CrntPost', {post_id: post})}>
       <ImageView
         imageIndex={0}
         images={images}
         FooterComponent={() => {
-          return (
-            <MessagePostF>{`${prop.post.message.slice(
-              0,
-              32,
-            )}...`}</MessagePostF>
-          );
+          return <MessagePostF>{`${message.slice(0, 32)}...`}</MessagePostF>;
         }}
         visible={fullScreen}
         onRequestClose={() => setFull(false)}
       />
-      {/* {renderBlockUser()} */}
+      {renderBlockUser()}
       <MessagePost>
-        {prop.post.message.length > 30
-          ? `${prop.post.message.slice(0, 32)} ...`
-          : prop.post.message}
+        {message}
+        {/* {message.length > 30 ? `${message.slice(0, 32)} ...` : message} */}
       </MessagePost>
-      {prop.post.image && (
+      {image && (
         <ImageTouch activeOpacity={0.7} onPress={() => setFull(true)}>
-          <ImagePost source={{uri: prop.post.image}} resizeMode={'contain'} />
+          <ImagePost source={{uri: image}} resizeMode={'contain'} />
         </ImageTouch>
       )}
+
       <HeadWrapper>
         <WrapperLC
-          onPress={() => navigation.navigate('CrntPost', {data: prop.post})}>
+          onPress={() => navigation.navigate('CrntPost', {post_id: post})}>
           <IconI name={'comment'} size={22} />
-          <CommentText>{prop.post.comments.length}</CommentText>
+          <CommentText>{comments}</CommentText>
         </WrapperLC>
         <WrapperLC>
-          <LikeText>{prop.post.likes.length}</LikeText>
+          <LikeText>{likes}</LikeText>
           <IconI name={'angelist'} size={26} />
         </WrapperLC>
       </HeadWrapper>

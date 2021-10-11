@@ -1,32 +1,34 @@
-import React, {useState, useCallback, useEffect} from 'react';
-import {View, Text, TouchableOpacity, Image, FlatList} from 'react-native';
+import React, {useState, useEffect, useCallback} from 'react';
+import {View, Text, FlatList, TouchableOpacity} from 'react-native';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../store/reducers/rootReduser';
 import styled from 'styled-components';
 import {Loading} from './LoadingComponent';
 import {Header} from '../../../Components/Header/Header';
 import ImageView from 'react-native-image-viewing';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {SearchParamList} from '../RootStackPrams';
 import {PostItem} from '../../../Components/News/postItem';
 import {Dispatch} from 'redux';
 import {fetchPostByIdRequest} from '../../../store/actions/postByIdActions/postByIdActions';
-import {getValueStorage} from '../../../storage/storage';
-import store from '../../../store/Store';
+import LinearGradient from 'react-native-linear-gradient';
+import {DefImgUsr} from '../../../Components/Default/DefaultImage';
+import {SearchUsrModalize} from './Modalize';
+import {subscribeRequest} from '../../../store/actions/activitesActions/activitesActions';
+import {fetchUserById} from '../../../store/actions/userByIdActions/userByIdActions';
+import {visibleTabBar} from '../Main/MainScreen';
+// import { joinRoom } from '../../../network/socket';
+// import {socketFollow} from '../../../network/socket';
 
+type searchUserScreenProp = StackNavigationProp<SearchParamList>;
+type Props = {
+  route: any;
+};
 const Wrapper = styled(View)`
   flex: 1;
   background-color: ${props => props.theme.background};
   align-content: center;
-`;
-
-const WrapperImage = styled(Image)`
-  align-self: center;
-  height: 150px;
-  width: 150px;
-  border-radius: 50px;
-  align-self: flex-start;
 `;
 const ErrorText = styled(Text)`
   text-align: center;
@@ -36,138 +38,238 @@ const ErrorText = styled(Text)`
 const WrapperBottom = styled(View)`
   margin-top: 44px;
 `;
-const ImageTouch = styled(TouchableOpacity)``;
-const WrapperInfo = styled(View)`
+const WrapperUser = styled(View)`
+  padding: 14px 4px;
+  margin: 0 14px;
   flex-direction: row;
   justify-content: space-around;
-  padding-bottom: 30px;
 `;
+
 const UserText = styled(Text)`
-  padding-top: 14px;
+  padding: 14px;
   font-size: 32px;
+  text-align: center;
   color: ${props => props.theme.text};
 `;
-// ЗАПОЛНИТЬ ВСЮ ИНФУ ПО ЮЗЕРУ
-// ВОЗМОЖНО ПЕРЕНЕСТИ ТАКУЮ ЖЕ ИНФОРМАЦИЮ НА СТРАНИЦУ ПРОФИЛЯ
-// ПОДТЯНУТЬ ПОСТЫ ПОЛЬЗОВАТЕЛЯ
-// ИНФОРМАЦИЯ
-// СДЕЛАТЬ ПОДПИСКУ
-type searchUserScreenProp = StackNavigationProp<SearchParamList>;
-type Props = {
-  route: any;
-};
+const WrapperActivity = styled(View)`
+  flex-direction: row;
+  justify-content: center;
+`;
+const Background = styled(LinearGradient)`
+  border: 0px solid ${props => props.theme.black};
+  border-radius: 14px;
+  margin: 0 10px;
+`;
+
+const WrapperTouch = styled(TouchableOpacity)`
+  padding: 12px 0;
+  padding-bottom: 0;
+  width: 50%;
+`;
+const WrapperBtn = styled(View)`
+  flex-direction: row;
+  justify-content: space-around;
+`;
+const FollowText = styled(Text)`
+  font-size: 18px;
+  padding: 14px;
+  text-align: center;
+  color: ${props => props.theme.white};
+`;
+const TextAct = styled(Text)`
+  color: ${props => props.theme.white};
+  padding: 4px 12px;
+  font-size: 12px;
+  text-align: center;
+`;
+
+const WrapperInf = styled(View)`
+  border: 0px solid ${props => props.theme.black};
+  border-bottom-width: 0.5px;
+  padding: 6px 0;
+  margin: 6px;
+`;
+const TextInf = styled(Text)`
+  padding: 6px 14px;
+  font-size: 16px;
+  color: ${props => props.theme.text};
+`;
+
 const ItemsFlat = styled(FlatList)`
   flex: 1;
   padding-bottom: 120px;
 `;
-
 const SearchUser = ({route}: Props) => {
   const {id} = route.params;
   const navigation = useNavigation<searchUserScreenProp>();
   const [fullScreen, setFull] = useState(false);
+  const [openMod, setMod] = useState(false);
 
-  const {error} = useSelector(
-    (state: RootState) => state.personal,
-    shallowEqual,
-  );
-  const {pending, post} = useSelector(
+  const {pending, data, error} = useSelector(
     (state: RootState) => state.postById,
     shallowEqual,
   );
-  const [loading, setLoading] = useState<boolean>(pending);
-  const [user, setUser] = useState<any>(id);
-  const [postsUser, setPosts] = useState<any>([]);
+  const {loading} = useSelector(
+    (state: RootState) => state.subscribe,
+    shallowEqual,
+  );
+  const {id_data, load_user} = useSelector(
+    (state: RootState) => state.user_byId,
+    shallowEqual,
+  );
+  const {personal} = useSelector(
+    (state: RootState) => state.personal,
+    shallowEqual,
+  );
   const dispatch: Dispatch<any> = useDispatch();
-  const st = store.getState();
-  const getPostsByUser = useCallback(() => {
-    // getValueStorage('user_id').then((user_id: any) => {
-    // console.log('user id', user_id);
-    dispatch(fetchPostByIdRequest(id._id));
-    setTimeout(() => {
-      setLoading(false);
-    }, 1200);
-    // });
-    setPosts(st.postById.post);
+  const getData = useCallback(() => {
+    dispatch(fetchUserById(id._id));
   }, [dispatch, id._id]);
 
-  const getDataCurrentUser = useCallback(() => {
-    setUser(id);
-    getPostsByUser();
-    setTimeout(() => {
-      setLoading(false);
-    }, 1200);
-  }, [getPostsByUser, id, user]);
-  const logIn = () => {
-    console.log('logIn', user);
-
-    // dispatch(fetchPostByIdRequest(id._id));
-
-    // getPostsByUser();
-    // get post by id
-    // navigation.navigate('Info', {id: id}); // id === полная инфа юзера
-  };
   useEffect(() => {
-    getDataCurrentUser();
-  }, [getDataCurrentUser]);
+    dispatch(fetchPostByIdRequest(id._id));
+    getData();
+  }, [dispatch, getData, id._id]);
 
-  const keyExtractor = (item: any, index: any) => index;
+  const onClose = () => {
+    setMod(false);
+  };
+  const startFollow = () => {
+    const id_f = {
+      id_follow: personal._id,
+    };
+    // subscribeRequest()
+    socket();
+  };
+  const startMessaging = () => {
+    navigation.navigate('GoChat', {userName: id.fullName, data: data});
+    visibleTabBar(false);
+  };
 
+  const socket = () => {
+    const roomName = personal._id + ' ' + id._id;
+  };
+  const keyExtractor = (_item: any, index: any) => index;
+  const headerComponent = () => {
+    return (
+      <Wrapper>
+        {load_user ? (
+          <Loading />
+        ) : (
+          <Wrapper>
+            <ImageView
+              imageIndex={0}
+              images={[
+                id_data.image
+                  ? {uri: id_data.image}
+                  : require('../../../assets/images/person.png'),
+              ]}
+              visible={fullScreen}
+              onRequestClose={() => setFull(false)}
+            />
+            <WrapperUser>
+              <DefImgUsr image={id_data.image} />
+              <Wrapper>
+                <UserText>{id_data.fullName}</UserText>
+                <WrapperActivity>
+                  <Background
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 1}}
+                    colors={['#0887cc', '#0B4257']}>
+                    <TextAct>
+                      {id_data.following ? id_data.following.length : 0}
+                    </TextAct>
+                    <TextAct>{'Following'}</TextAct>
+                  </Background>
+                  <Background
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 1}}
+                    colors={['#0B4257', '#0887cc']}>
+                    <TextAct>
+                      {id_data.followers ? id_data.followers.length : 0}
+                    </TextAct>
+                    <TextAct>{'Followers'}</TextAct>
+                  </Background>
+                </WrapperActivity>
+              </Wrapper>
+            </WrapperUser>
+            <WrapperBtn>
+              <WrapperTouch onPress={startFollow}>
+                {loading ? (
+                  <Loading />
+                ) : (
+                  <Background
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 1}}
+                    colors={['rgba(152, 212, 234, 0.82)', '#0B4257']}>
+                    <FollowText>{'Set follow'}</FollowText>
+                  </Background>
+                )}
+              </WrapperTouch>
+              <WrapperTouch onPress={startMessaging}>
+                <Background
+                  start={{x: 0, y: 0}}
+                  end={{x: 1, y: 1}}
+                  colors={['#0B4257', 'rgba(152, 212, 234, 0.82)']}>
+                  <FollowText>{'Start chating'}</FollowText>
+                </Background>
+              </WrapperTouch>
+            </WrapperBtn>
+
+            <WrapperInf>
+              <TextInf>{id_data.information}</TextInf>
+            </WrapperInf>
+          </Wrapper>
+        )}
+      </Wrapper>
+    );
+  };
   return (
     <Wrapper>
-      <ImageView
-        imageIndex={0}
-        images={[
-          user.image
-            ? {uri: user.image}
-            : require('../../../assets/images/person.png'),
-        ]}
-        visible={fullScreen}
-        onRequestClose={() => setFull(false)}
-      />
-      <Header
-        pressL={navigation.goBack}
-        pressR={logIn}
-        title={user.fullName}
-        leftIcon={'chevron-back'}
-        rightIcon={'ellipsis-horizontal'}
-      />
-      <ItemsFlat
-        // eslint-disable-next-line react-native/no-inline-styles
-        ListHeaderComponentStyle={{marginTop: 14}}
-        ListHeaderComponent={
-          loading ? (
+      {load_user ? (
+        <Loading />
+      ) : (
+        <Wrapper>
+          <ImageView
+            imageIndex={0}
+            images={[
+              id_data.image
+                ? {uri: id_data.image}
+                : require('../../../assets/images/person.png'),
+            ]}
+            visible={fullScreen}
+            onRequestClose={() => setFull(false)}
+          />
+          <Header
+            pressL={navigation.goBack}
+            pressR={() => setMod(true)}
+            title={id_data.fullName}
+            leftIcon={'chevron-back'}
+            rightIcon={'ellipsis-horizontal'}
+          />
+          {pending ? (
             <Loading />
           ) : error ? (
-            <ErrorText>{'Errors :('}</ErrorText>
+            <WrapperBottom>
+              <ErrorText>{'Errors :('}</ErrorText>
+            </WrapperBottom>
           ) : (
-            <WrapperInfo>
-              <ImageTouch
-                activeOpacity={0.7}
-                onPress={() =>
-                  user.image ? console.log('set full') : setFull(true)
-                }>
-                <WrapperImage
-                  source={
-                    user.image
-                      ? {uri: user.image}
-                      : require('../../../assets/images/person.png')
-                  }
-                  resizeMode={'cover'}
-                />
-              </ImageTouch>
-              <UserText>{user.fullName}</UserText>
-            </WrapperInfo>
-          )
-        }
-        showsVerticalScrollIndicator={false}
-        data={postsUser}
-        keyExtractor={keyExtractor}
-        renderItem={({item, index}) => (
-          <PostItem pending={pending} post={item} key={index} />
-        )}
-      />
-
-      <WrapperBottom />
+            <ItemsFlat
+              ListHeaderComponent={headerComponent}
+              showsVerticalScrollIndicator={false}
+              data={data}
+              keyExtractor={keyExtractor}
+              renderItem={({item, index}) => (
+                <PostItem pending={pending} post={item} key={index} />
+              )}
+            />
+          )}
+          {openMod && (
+            <SearchUsrModalize handleClosed={onClose} user={id_data} />
+          )}
+          <WrapperBottom />
+        </Wrapper>
+      )}
     </Wrapper>
   );
 };

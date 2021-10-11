@@ -16,8 +16,10 @@ import {setValueStorage} from '../../../storage/storage';
 const registerUserService = (request: any) =>
   axios
     .post<RegistIdUser[]>(api.users, request)
-    .then(response => {
+    .then((response: any) => {
+      console.log(response, api.users);
       setValueStorage('user_id', response.data.id).then();
+      console.log(response.data);
       return response;
     })
     .then(response => {
@@ -25,18 +27,12 @@ const registerUserService = (request: any) =>
     });
 
 const authorizationService = (request: any) =>
-  axios
-    .post<AuthTokenUser[]>(api.auth, request)
-    .then(response => {
-      return response;
-    })
-    .then(response => {
-      setValueStorage('tokenAuth', response.data.accessToken).then(() => {
-        const auth = 'Bearer ' + response.data.accessToken;
-        setValueStorage('header_auth', auth).then();
-      });
-      return response.data;
-    });
+  axios.post<AuthTokenUser[]>(api.auth, request).then((response: any) => {
+    console.log(response.data);
+    setValueStorage('user_id', response.data.id).then();
+    setValueStorage('tokenAuth', response.data.accessToken).then();
+    return response.data;
+  });
 
 export function* authorizationUser(payload: any) {
   try {

@@ -62,13 +62,17 @@ const TextError = styled(Text)`
   font-weight: bold;
 `;
 const Button = styled(TouchableOpacity)`
+  align-self: center;
   background-color: ${props => props.theme.blue};
-  border: 0 ${props => props.theme.secondary};
-  border-radius: 12px;
-  margin: 0 10px;
+  border: 0 ${props => props.theme.black};
+  border-bottom-width: 0.5px;
+  border-left-width: 0.5px;
+  border-radius: 22px;
+  border-bottom-right-radius: 4px;
+  border-top-left-radius: 12px;
 `;
 const TextDef = styled(Text)`
-  color: ${props => props.theme.darkblue};
+  color: ${props => props.theme.black};
   font-size: 18px;
   padding: 16px 10px;
   text-align: center;
@@ -104,7 +108,7 @@ const RegistrationScreen = () => {
       mobile_phone: number,
     };
     dispatch(registUser(dataUser));
-    setCheck(true);
+    // setCheck(true);
     setTimeout(() => {
       const authD = {
         email: email,
@@ -112,7 +116,7 @@ const RegistrationScreen = () => {
       };
       dispatch(authUser(authD));
       setCheck(false);
-      navigation.navigate('Main');
+      // navigation.navigate('Main');
     }, 3000);
   };
   const inputValue = (value: string, typeV: string) => {

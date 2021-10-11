@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {View, Text, FlatList} from 'react-native';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../store/reducers/rootReduser';
@@ -35,23 +35,24 @@ const NewsScreen = () => {
     shallowEqual,
   );
   const [loading, setLoading] = useState<boolean>(pending);
-
-  useEffect(() => {
-    refreshNews();
-  }, []);
-  const refreshNews = () => {
+  const refreshNews = useCallback(() => {
     setLoading(true);
     dispatch(fecthPostRequest());
 
     setTimeout(() => {
       setLoading(false);
     }, 2000);
-  };
+  }, [dispatch]);
+
+  useEffect(() => {
+    refreshNews();
+  }, [refreshNews]);
+
   const logIn = () => {
     console.log('logIn');
   };
 
-  const keyExtractor = (item: any, index: any) => index;
+  const keyExtractor = (_item: any, index: any) => index;
   return (
     <Wrapper>
       {loading ? (

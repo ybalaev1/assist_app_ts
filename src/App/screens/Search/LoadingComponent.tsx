@@ -7,8 +7,8 @@ const Loading = () => {
   const WrapperCentered = styled(View)`
     align-items: center;
     align-self: center;
-    padding-left: 10px;
-    padding-top: 100px;
+    padding-left: 40px;
+    padding-top: 0px;
     justify-content: center;
   `;
   const d =
@@ -17,9 +17,9 @@ const Loading = () => {
     <WrapperCentered>
       <AnimatedSVGPath
         strokeColor={'white'}
-        duration={600}
-        strokeWidth={6}
-        height={100}
+        duration={200}
+        strokeWidth={4}
+        height={80}
         width={100}
         scale={0.95}
         delay={0}

@@ -25,3 +25,17 @@ export function getDateString(time: number) {
 
   return newDate;
 }
+
+export function getTime(time: number) {
+  if (!time || time === 0) {
+    return '';
+  }
+
+  const timeObject = new Date(time);
+  if (timeObject.getMinutes() <= 9) {
+    const newTime = timeObject.getHours() + ':' + '0' + timeObject.getMinutes();
+    return newTime;
+  }
+  const newTime = timeObject.getHours() + ':' + timeObject.getMinutes();
+  return newTime;
+}

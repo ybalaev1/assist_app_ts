@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {TextInput, View} from 'react-native';
 import styled from 'styled-components';
 import IconIonic from 'react-native-vector-icons/Ionicons';
@@ -16,22 +16,44 @@ const Wrapper = styled(View)`
   border-bottom-width: 0.5px;
 `;
 const WrapperInput = styled(TextInput)`
-  background-color: ${props => props.theme.blue};
   color: ${props => props.theme.text};
-  border: 0 solid ${props => props.theme.black};
-  border-bottom-width: 0.5px;
 `;
 const IconI = styled(IconIonic)`
   color: ${props => props.theme.black};
   padding: 16px;
 `;
+interface Props {
+  users?: any;
+  filtered: (data: string[]) => void;
+  initialUsers: () => void;
+}
 
-const SearchBar = () => {
+const SearchBar = ({users, filtered, initialUsers}: Props) => {
   const {themeMode} = useSelector((state: RootState) => state.themeMode);
+  const [searchValue, setSearchValue] = useState<string>('');
+  const getFiltered = (value: string) => {
+    setSearchValue(value);
+    const f = users.filter((s: any) => {
+      return s.fullName.startsWith(searchValue);
+    });
+    filtered(f);
+  };
+
   return (
     <Wrapper>
       <IconI name={'search-outline'} size={18} />
       <WrapperInput
+        value={searchValue}
+        onKeyPress={ev => {
+          if (
+            ev.nativeEvent.key === 'Backspace' &&
+            searchValue.length <= 2 &&
+            searchValue.length > 0
+          ) {
+            initialUsers();
+          }
+        }}
+        onChange={value => getFiltered(value.nativeEvent.text)}
         placeholder={'Press type for search users ...'}
         placeholderTextColor={themeMode === 'dark' ? 'white' : '#424242'}
       />

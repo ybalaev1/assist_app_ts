@@ -1,7 +1,7 @@
 import {postByIdTypes} from '../action_types/usersTypes';
 
 export interface FetchPostByIdSuccessPayload {
-  post: any;
+  data: any;
 }
 export interface FetchPostByIdFailturePayload {
   error: any;

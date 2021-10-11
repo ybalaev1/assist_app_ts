@@ -1,8 +1,5 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {View, Text, FlatList} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {SearchParamList} from '../RootStackPrams';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../store/reducers/rootReduser';
 import styled from 'styled-components';
@@ -11,8 +8,9 @@ import {Loading} from './LoadingComponent';
 import {fetchUsersRequest} from '../../../store/actions/usersActions/usersActions';
 import {SearchItem} from '../../../Components/Search/searchItem';
 import {SearchBar} from './SearchBar';
+import {Header} from '../../../Components/Header/Header';
+import {useNavigation} from '@react-navigation/native';
 
-type searchScreenProp = StackNavigationProp<SearchParamList>;
 const Wrapper = styled(View)`
   flex: 1;
   background-color: ${props => props.theme.background};
@@ -33,42 +31,58 @@ const WrapperBottom = styled(View)`
 `;
 
 const SearchScreen = () => {
-  const navigation = useNavigation<searchScreenProp>();
   const dispatch: Dispatch<any> = useDispatch();
+  const navigation = useNavigation();
 
   const {users, pending, error} = useSelector(
     (state: RootState) => state.users,
     shallowEqual,
   );
-  const [loading, setLoading] = useState<boolean>(pending);
-  const [searchValue, setSearchValue] = useState<string[]>();
 
-  useEffect(() => {
-    refreshUsers();
-  }, []);
-  const refreshUsers = () => {
-    setLoading(true);
+  const [refreshing, setRefreshing] = useState<boolean>(pending);
+  const [usersArray, setUsersArray] = useState<any>();
+
+  const refreshUsers = useCallback(() => {
+    setRefreshing(true);
     dispatch(fetchUsersRequest());
     setTimeout(() => {
-      setLoading(false);
-    }, 1200);
-  };
-  const logIn = () => {
-    console.log('logIn', users);
+      setRefreshing(false);
+      setUsersArray(users);
+    }, 200);
+  }, [dispatch, setUsersArray, users]);
+
+  const filteredUsers = (newUsers: any) => {
+    setUsersArray(newUsers);
   };
 
-  const keyExtractor = (item: any, index: any) => index;
+  useEffect(() => {
+    const unscribe = navigation.addListener('focus', () => {
+      refreshUsers;
+    });
+    return unscribe;
+  }, [navigation, refreshUsers]);
+
+  const keyExtractor = (_item: any, index: any) => index;
   return (
     <Wrapper>
-      {loading ? (
+      <Header title={'Search'} />
+      {refreshing ? (
         <Loading />
       ) : error ? (
-        <ErrorText>{'Errors :('}</ErrorText>
+        <ErrorText>{'Not load data :('}</ErrorText>
       ) : (
         <ItemsFlat
-          ListHeaderComponent={<SearchBar />}
+          onRefresh={refreshUsers}
+          refreshing={refreshing}
+          ListHeaderComponent={
+            <SearchBar
+              users={users}
+              initialUsers={refreshUsers}
+              filtered={data => filteredUsers(data)}
+            />
+          }
           showsVerticalScrollIndicator={false}
-          data={users}
+          data={usersArray}
           keyExtractor={keyExtractor}
           renderItem={({item, index}) => <SearchItem user={item} key={index} />}
         />

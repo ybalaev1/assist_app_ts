@@ -7,11 +7,9 @@ import {
 import {IPost} from '../../../models/models';
 import {api} from '../../../network/api_request';
 const getPostByIdService = (id: string) =>
-  axios
-    .get<IPost[]>(api.users_local + '/' + id + '/posts')
-    .then((response: any) => {
-      return response.data.posts;
-    });
+  axios.get<IPost[]>(api.users + '/' + id + '/posts').then((response: any) => {
+    return response.data.posts;
+  });
 
 export function* getPostById(payload: any) {
   const {id} = payload;
@@ -22,7 +20,7 @@ export function* getPostById(payload: any) {
     );
     yield put(
       fetchPostByIdSuccess({
-        post: response,
+        data: response,
       }),
     );
   } catch (error) {

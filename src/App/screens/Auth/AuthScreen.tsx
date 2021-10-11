@@ -20,7 +20,7 @@ import {authUser} from '../../../store/actions/authActions/authActions';
 
 type regScreenProp = StackNavigationProp<
   OnboardingStackParamList,
-  'Registration'
+  'Auth'
 >;
 const {DARK} = ThemeModEnum;
 const errorValueType = '';

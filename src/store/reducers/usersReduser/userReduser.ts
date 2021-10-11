@@ -1,3 +1,4 @@
+import {getValueStorage} from '../../../storage/storage';
 import {usersTypes} from '../../action_types/usersTypes';
 import {UserState, UsersActions} from '../../types/types';
 const initialState: UserState = {
@@ -5,7 +6,7 @@ const initialState: UserState = {
   users: [],
   error: null,
 };
-
+const current_id = getValueStorage('user_id').then();
 export default (state = initialState, action: UsersActions) => {
   switch (action.type) {
     case usersTypes.FETCH_USER_REQUEST:
@@ -14,10 +15,15 @@ export default (state = initialState, action: UsersActions) => {
         pending: true,
       };
     case usersTypes.FETCH_USER_SUCCESS:
+      const id = current_id._W;
+      const data = action.payload.users.data;
+      const filter = data.filter((a: {_id: string}) => {
+        return a._id !== id;
+      });
       return {
         ...state,
         pending: false,
-        users: action.payload.users.data,
+        users: filter,
         error: null,
       };
     case usersTypes.FETCH_USER_FAILURE:
