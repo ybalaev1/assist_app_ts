@@ -7,11 +7,13 @@ import {OnboardingStackParamList} from '../RootStackPrams';
 import {TouchableOpacity} from 'react-native';
 import {RootState} from 'src/store/reducers/rootReduser';
 import {useDispatch, useSelector} from 'react-redux';
-import {getValueStorage, removeItem} from '../../../storage/storage';
+import {getValueStorage} from '../../../storage/storage';
 import {Dispatch} from 'redux';
 import {fetchPersonalRequest} from '../../../store/actions/presonalActions/presonalActions';
 import {initWebSocket} from '../../../network/socket';
-import { visibleTabBar } from '../Main/MainScreen';
+import {visibleTabBar} from '../Main/MainScreen';
+import axios from 'axios';
+import { api } from '../../../network/api_request';
 const Wrapper = styled(View)`
   flex: 1;
   padding: 30px 0;
@@ -66,15 +68,13 @@ const Preview = () => {
           navigation.navigate('Registration');
         }, 2000);
       } else {
-        // const headers = {
-        //   'Content-Type': 'application/json',
-        //   Authorization: 'Bearer ' + token,
-        // };
-        // axios.defaults.headers = headers;
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        };
+        axios.defaults.headers = headers;
         getValueStorage('user_id').then((id: any) => {
-          console.log(id);
           dispatch(fetchPersonalRequest(id));
-          // initWebSocket();
           visibleTabBar(true);
           navigation.navigate('Main');
         });

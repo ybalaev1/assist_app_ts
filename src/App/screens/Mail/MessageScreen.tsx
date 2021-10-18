@@ -1,68 +1,49 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {View} from 'react-native';
 import {Header} from '../../../Components/Header/Header';
 import styled from 'styled-components';
-import axios from 'axios';
-import {MessItem} from './MessageItem';
 import {useNavigation} from '@react-navigation/core';
+import {useDispatch, useSelector} from 'react-redux';
+import {getChats} from '../../../store/mail/chats_actions/chat_actions';
+import {RootState} from '../../../store/reducers/rootReduser';
+import {Loading} from './LoadingComponent';
+import {MessagesItems} from './Items';
 
 const Wrapper = styled(View)`
   flex: 1;
   background-color: ${props => props.theme.background};
 `;
-const ItemsFlat = styled(FlatList)`
-  flex: 1;
-  padding-bottom: 120px;
-`;
-
 const MessageContainer = () => {
-  const [chats, setChats] = useState([]);
   const navigation = useNavigation();
-  const [refreshing, setRefreshing] = useState<boolean>(true);
+  const dispatch = useDispatch();
+  const {loading} = useSelector((state: RootState) => state.chats);
 
-  const getChats = useCallback(() => {
+  const [refreshing, setRefreshing] = useState<boolean>(true);
+  const getChatsRequest = useCallback(() => {
     setRefreshing(true);
-    const user = {
-      id: '6131c08d75e362001635886f',
-    };
-    axios
-      .get('https://assistapp.club/chats', {params: user})
-      .then((response: any) => {
-        const {data} = response.data;
-        const filter = data.sort(
-          (a: {updatedAt: number}, b: {updatedAt: number}) => {
-            return b.updatedAt > a.updatedAt;
-          },
-        );
-        setChats(filter);
-      });
+    dispatch(getChats());
     setRefreshing(false);
-  }, []);
+  }, [dispatch]);
+
   useEffect(() => {
     const unscribe = navigation.addListener('focus', () => {
-      getChats();
+      getChatsRequest();
     });
-
     return unscribe;
-  }, [getChats, navigation]);
-
-  const keyExtractor = (_item: any, index: any) => index;
+  }, [getChatsRequest, navigation]);
 
   return (
     <Wrapper>
-      <Header title={'Messenger'} />
-      <ItemsFlat
-        onRefresh={() => getChats()}
-        refreshing={refreshing}
-        showsVerticalScrollIndicator={false}
-        data={chats}
-        keyExtractor={keyExtractor}
-        renderItem={({item, index}) => {
-          return <MessItem key={index} id={item._id} />;
-        }}
-      />
+      <Header title={'Messenger'} rightIcon={'add'} pressR={getChatsRequest} />
+      {loading ? (
+        <Loading />
+      ) : (
+        <MessagesItems
+          getChatsRequest={getChatsRequest}
+          refreshing={refreshing}
+        />
+      )}
     </Wrapper>
   );
 };
-
 export {MessageContainer};

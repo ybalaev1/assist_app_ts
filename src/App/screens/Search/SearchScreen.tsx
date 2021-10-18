@@ -82,7 +82,7 @@ const SearchScreen = () => {
             />
           }
           showsVerticalScrollIndicator={false}
-          data={usersArray}
+          data={users}
           keyExtractor={keyExtractor}
           renderItem={({item, index}) => <SearchItem user={item} key={index} />}
         />

@@ -26,7 +26,7 @@ export function* getPosts() {
   } catch (e) {
     yield put(
       fetchPostsFailure({
-        error: e.message,
+        error: e,
       }),
     );
   }

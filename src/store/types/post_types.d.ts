@@ -4,7 +4,7 @@ export interface FetchPostsSuccessPayload {
   posts: any;
 }
 export interface FetchPostsFilturePayload {
-  error: string;
+  error: string[] | any;
 }
 export interface FetchPostRequest {
   type: typeof postTypes.FETCH_POST_REQUEST;

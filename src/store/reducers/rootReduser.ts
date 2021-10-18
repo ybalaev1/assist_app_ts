@@ -9,6 +9,9 @@ import registReducer from './registReducer/registReducer';
 import userReduser from './usersReduser/userReduser';
 import activitiesReducer from './activitiesReducer/activitiesReducer';
 import userByIdReducer from './userByIdReducer/userByIdReducer';
+import chatReducer from '../mail/reducers/chatReducer/chatReducer';
+import chatByIdReducer from '../mail/reducers/chatByIdReducer/chatByIdReducer';
+import messagesReducer from '../mail/reducers/messageReducer/messageReducer';
 
 const rootReducer = combineReducers({
   posts: postReducer,
@@ -20,6 +23,9 @@ const rootReducer = combineReducers({
   postById: postByIdReducer,
   subscribe: activitiesReducer,
   user_byId: userByIdReducer,
+  chats: chatReducer,
+  chat_id: chatByIdReducer,
+  messages: messagesReducer,
 });
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof rootReducer>;

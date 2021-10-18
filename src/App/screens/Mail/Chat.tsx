@@ -15,6 +15,10 @@ import {visibleTabBar} from '../Main/MainScreen';
 import IconIonic from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {RenderUserMessage} from './MessageUserMessage';
+import {getChatById} from '../../../store/mail/chats_actions/chat_actions';
+import {shallowEqual, useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../../store/reducers/rootReduser';
+import {getMessages} from '../../../store/mail/message_actions/message_actions';
 
 const UserWrapper = styled(View)``;
 
@@ -82,39 +86,40 @@ const Chat = ({route}: Props) => {
   const [heightInput, setHeightInput] = useState(0);
   const [iconColor, setIconColor] = useState<boolean>(false);
   const [iconRemove, setIconRemove] = useState<boolean>(false);
-  const [messages, setMessage] = useState<any>([]);
+  // const [messages, setMessage] = useState<any>([]);
+  const dispatch = useDispatch();
+
+  const {loading, messages, errors} = useSelector(
+    (state: RootState) => state.messages,
+    shallowEqual,
+  );
+  const {chat_data} = useSelector(
+    (state: RootState) => state.chat_id,
+    shallowEqual,
+  );
   const sendMessage = () => {
     const mes = {
       message: text,
       chat_id: data,
-      user_id: '6131c08d75e362001635886f',
+      user_id: '616407104da767ce25143cb7',
     };
     setText('');
     if (text.length > 0) {
-      axios.post(`https://assistapp.club/chats/${data}`, {data: mes}).then();
+      axios.post(`http://localhost:3000/chats/${data}`, {data: mes}).then();
     }
     getDataChat();
   };
   const keyExtractor = (_item: any, index: any) => index;
 
   const getDataChat = useCallback(() => {
-    const item = {
-      user: '6131c08d75e362001635886f',
-    };
-    axios
-      .get(`https://assistapp.club/chats/${data}`, {params: item})
-      .then(chat => {
-        const chatData = chat.data.data;
-        setTitle(chatData.user.fullName);
-      });
-    axios.get(`https://assistapp.club/${data}`).then(conversion => {
-      const {conversation} = conversion.data;
-      setMessage(conversation);
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({animated: true});
-      }, 500);
-    });
-  }, [data]);
+    dispatch(getMessages(data));
+    dispatch(getChatById(data));
+    setTitle(chat_data.user.fullName);
+
+    setTimeout(() => {
+      flatListRef.current?.scrollToEnd({animated: true});
+    }, 500);
+  }, [chat_data.user.fullName, data, dispatch]);
   const removeMessagById = (id: string) => {
     axios.delete(`http://localhost:3000/messages/${id}`).then();
     getDataChat();

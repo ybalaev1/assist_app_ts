@@ -116,7 +116,7 @@ const RegistrationScreen = () => {
       };
       dispatch(authUser(authD));
       setCheck(false);
-      // navigation.navigate('Main');
+      navigation.navigate('Main');
     }, 3000);
   };
   const inputValue = (value: string, typeV: string) => {

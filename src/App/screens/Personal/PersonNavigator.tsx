@@ -4,7 +4,8 @@ import {View} from 'react-native';
 import styled from 'styled-components';
 import {PersonParamList} from '../RootStackPrams';
 import {AppInfo} from './AppInfo';
-import { Feedback } from './FeedBack';
+import {CrntPost} from './CurrentPost';
+import {Feedback} from './FeedBack';
 import Personal from './Person';
 import {Setting} from './Setting';
 const Wrapper = styled(View)`
@@ -29,6 +30,16 @@ const PersonNavigator = () => {
         <Stack.Screen name={'Setting'} component={Setting} />
         <Stack.Screen name={'AppInfo'} component={AppInfo} />
         <Stack.Screen name={'FeedBack'} component={Feedback} />
+        <Stack.Group
+          screenOptions={{
+            presentation: 'modal',
+            headerShown: false,
+            cardShadowEnabled: true,
+            cardOverlayEnabled: true,
+            animationTypeForReplace: 'pop',
+          }}>
+          <Stack.Screen name={'CrntPost'} component={CrntPost} />
+        </Stack.Group>
       </Stack.Navigator>
     </Wrapper>
   );

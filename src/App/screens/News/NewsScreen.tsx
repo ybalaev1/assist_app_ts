@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import {Dispatch} from 'redux';
 import {Loading} from './LoadingComponent';
 import {Header} from '../../../Components/Header/Header';
+import { useNavigation } from '@react-navigation/core';
 
 const Wrapper = styled(View)`
   flex: 1;
@@ -30,6 +31,7 @@ const WrapperBottom = styled(View)`
 
 const NewsScreen = () => {
   const dispatch: Dispatch<any> = useDispatch();
+  const navigation = useNavigation();
   const {pending, posts, error} = useSelector(
     (state: RootState) => state.posts,
     shallowEqual,
@@ -49,7 +51,7 @@ const NewsScreen = () => {
   }, [refreshNews]);
 
   const logIn = () => {
-    console.log('logIn');
+    navigation.navigate('Create');
   };
 
   const keyExtractor = (_item: any, index: any) => index;
