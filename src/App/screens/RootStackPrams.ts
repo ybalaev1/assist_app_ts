@@ -57,6 +57,7 @@ export type PersonParamList = {
   [Routes.Setting]: React.Component;
   [Routes.AppInfo]: React.Component;
   [Routes.FeedBack]: React.Component;
+  [Routes.CrntPost]: {data: any};
 };
 
 export type MailParamList = {

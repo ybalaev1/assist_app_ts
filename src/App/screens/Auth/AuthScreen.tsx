@@ -18,10 +18,7 @@ import {ThemeModEnum} from '../../../types/theme/themeMod.slice';
 import {ModalWindowCheck} from '../../../Components/Modals/ModalResponseTrue';
 import {authUser} from '../../../store/actions/authActions/authActions';
 
-type regScreenProp = StackNavigationProp<
-  OnboardingStackParamList,
-  'Auth'
->;
+type regScreenProp = StackNavigationProp<OnboardingStackParamList, 'Auth'>;
 const {DARK} = ThemeModEnum;
 const errorValueType = '';
 interface errorsType {

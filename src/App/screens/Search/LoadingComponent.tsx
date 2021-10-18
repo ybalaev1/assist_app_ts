@@ -17,7 +17,7 @@ const Loading = () => {
     <WrapperCentered>
       <AnimatedSVGPath
         strokeColor={'white'}
-        duration={200}
+        duration={800}
         strokeWidth={4}
         height={80}
         width={100}

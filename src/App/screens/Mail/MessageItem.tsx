@@ -1,14 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {Image, Text, View, TouchableOpacity, Animated} from 'react-native';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {Image, Text, View, TouchableOpacity} from 'react-native';
 import styled from 'styled-components';
+
+import {connect, shallowEqual} from 'react-redux';
+
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {MailParamList} from '../RootStackPrams';
-import axios from 'axios';
 import {visibleTabBar} from '../Main/MainScreen';
 import {getTime} from '../../../storage/middleware';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import IconIonic from 'react-native-vector-icons/Ionicons';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../../../store/reducers/rootReduser';
+import {getChatById} from '../../../store/mail/chats_actions/chat_actions';
+import axios from 'axios';
 
 type mailScreenProp = StackNavigationProp<MailParamList>;
 
@@ -55,11 +61,36 @@ const LastMessageTime = styled(Text)`
   text-align: right;
   color: ${props => props.theme.gray};
 `;
-
 type Props = {
-  id: any;
+  chat: any;
 };
-const MessItem = ({id}: Props) => {
+// type Props = {
+//   _id?: string;
+//   user: {
+//     fullName: string;
+//     image?: string;
+//   };
+//   users: string[];
+//   favorite: boolean;
+//   last_user: string;
+//   createdAt: Date;
+//   updatedAt: Date;
+//   latestMessage:
+//     | string
+//     | {
+//         iv: string;
+//         encryptedData: string;
+//       };
+// };
+// const MessItem = ({
+//   _id,
+//   user,
+//   favorite,
+//   last_user,
+//   latestMessage,
+//   updatedAt,
+// }: Props) => {
+const MessItem = ({chat}: Props) => {
   const navigation = useNavigation<mailScreenProp>();
   const WrapperItem = styled(TouchableOpacity)`
     flex: 1;
@@ -73,18 +104,36 @@ const MessItem = ({id}: Props) => {
     border-radius: 6px;
     margin: 4px 6px;
   `;
-  const [itemData, setData] = useState<any>([]);
+  const dispatch = useDispatch();
+
+  const {loading, chat_data, errors} = useSelector(
+    (state: RootState) => state.chat_id,
+    shallowEqual,
+  );
+  const [chatData, setChat] = useState(chat_data);
+  // const getChat = useCallback(() => {
+    // dispatch(getChatById(chat._id));
+  //   console.log(chat_data);
+  // }, [dispatch, chat._id]);
+
   useEffect(() => {
-    const currentUser = {
-      user: '6131c08d75e362001635886f',
-    };
-    axios
-      .get(`https://assistapp.club/chats/${id}`, {params: currentUser})
-      .then((response: any) => {
-        const {data} = response.data;
-        setData(data);
-      });
-  }, [id]);
+    // dispatch(getChatById(chat._id));
+    // getChat;
+    // console.log(chat_data);
+    //   _id,
+    //   user,
+    //   favorite,
+    //   last_user,
+    //   latestMessage,
+    //   updatedAt,
+    // );
+    // console.log(chat._id);
+    // axios
+    //   .get('http://localhost:3000/chats/' + chat._id)
+    //   .then((response: any) => {
+    //     setChat(response.data.data);
+    // });
+  }, []);
 
   const Icon = styled(IconIonic)`
     color: ${props => props.theme.red};
@@ -99,41 +148,41 @@ const MessItem = ({id}: Props) => {
       </TouchableOpacity>
     );
   };
-  const handleChat = () => {
+  const handlePressChat = () => {
     visibleTabBar(false);
-    navigation.navigate('Message', {data: id});
+    navigation.navigate('Message', {data: chat._id});
   };
 
   return (
-    <WrapperItem onPress={handleChat} activeOpacity={0.8}>
+    <WrapperItem onPress={handlePressChat} activeOpacity={0.8}>
       <Swipeable renderRightActions={renderLeftActions}>
-        {itemData.user ? (
+        {chatData.user ? (
           <HeadWrapper>
             <UserWrapper>
               <UserImage
                 source={
-                  itemData.user.image === 'favor'
+                  chatData.chat.favorite
                     ? require('../../../assets/images/save.png')
-                    : itemData.user.image
-                    ? {uri: itemData.user.image}
+                    : chatData.user.image
+                    ? {uri: chatData.user.image}
                     : require('../../../assets/images/person.png')
                 }
               />
               <WrapperName>
-                <UserName>{itemData.user.fullName}</UserName>
+                <UserName>{chatData.user.fullName}</UserName>
                 <LatestWrapper>
-                  <LastMessageName>{itemData.chat.last_user}</LastMessageName>
+                  <LastMessageName>{chatData.last_user}</LastMessageName>
                   <LatestWrapper>
                     <LastMessage>
-                      {itemData.chat.latestMessage.toString().length > 24
-                        ? `${itemData.chat.latestMessage
+                      {chatData.latestMessage.toString().length > 24
+                        ? `${chatData.latestMessage
                             .toString()
                             .replaceAll('\n', ' ')
                             .slice(0, 24)}...`
-                        : itemData.chat.latestMessage}
+                        : chatData.latestMessage}
                     </LastMessage>
                     <LastMessageTime>
-                      {getTime(Date.parse(itemData.chat.updatedAt))}
+                      {getTime(Date.parse(chatData.updatedAt))}
                     </LastMessageTime>
                   </LatestWrapper>
                 </LatestWrapper>
@@ -147,5 +196,4 @@ const MessItem = ({id}: Props) => {
     </WrapperItem>
   );
 };
-
 export {MessItem};

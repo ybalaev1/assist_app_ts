@@ -1,6 +1,6 @@
 import {personalTypes} from '../../../store/action_types/usersTypes';
-import {PersonalActions, UserState} from '../../../store/types/personalTypes';
-const initialState: UserState = {
+import {PersonalActions} from '../../../store/types/personalTypes';
+const initialState = {
   pending: false,
   personal: [],
   error: null,

@@ -3,6 +3,7 @@ import React from 'react';
 import {View} from 'react-native';
 import styled from 'styled-components';
 import {NewsParamList} from '../RootStackPrams';
+import { CreatedPost } from './CreatePost';
 import {CrntPost} from './CurrentPost';
 import NewsScreen from './NewsScreen';
 
@@ -18,15 +19,23 @@ const NewshNavigator = () => {
     <Wrapper>
       <Stack.Navigator
         screenOptions={{
-          presentation: 'modal',
+          presentation: 'card',
           headerShown: false,
           cardShadowEnabled: true,
           cardOverlayEnabled: true,
           animationTypeForReplace: 'pop',
         }}>
-        <Stack.Group>
-          <Stack.Screen name={'News'} component={NewsScreen} />
+        <Stack.Screen name={'News'} component={NewsScreen} />
+        <Stack.Group
+          screenOptions={{
+            presentation: 'modal',
+            headerShown: false,
+            cardShadowEnabled: true,
+            cardOverlayEnabled: true,
+            animationTypeForReplace: 'pop',
+          }}>
           <Stack.Screen name={'CrntPost'} component={CrntPost} />
+          <Stack.Screen name={'Create'} component={CreatedPost} />
         </Stack.Group>
       </Stack.Navigator>
     </Wrapper>

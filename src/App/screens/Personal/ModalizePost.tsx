@@ -100,14 +100,7 @@ const PostModalize = ({logout, handleClosed, name}: Props) => {
       }}
       modalTopOffset={deviceHeight / 3}
       HeaderComponent={renderHeader()}>
-      <TouchIcon onPress={() => navigation.navigate('Setting')}>
-        <TextDefault>{'Setting`s'}</TextDefault>
-        <IconI name={'cog-outline'} size={22} />
-      </TouchIcon>
-      <TouchIcon onPress={shareLink}>
-        <TextDefault>{'Share profile'}</TextDefault>
-        <IconI name={'ios-share-social-outline'} size={22} />
-      </TouchIcon>
+
       <TouchIcon onPress={() => navigation.navigate('AppInfo')}>
         <TextDefault>{'App information'}</TextDefault>
         <IconI name={'code-working-outline'} size={22} />
