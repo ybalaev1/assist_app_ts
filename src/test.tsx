@@ -12,7 +12,7 @@ import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import {React$Node} from 'src/types/AppTypes';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import {RootState} from 'src/store/reducers/rootReduser';
-import {fetchUsersRequest} from './src/store/actions/usersActions/usersActions';
+import {fetchUsersRequest} from '../src/store/actions/usersActions/usersActions';
 import {Dispatch} from 'redux';
 
 const App: () => React$Node = () => {

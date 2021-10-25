@@ -7,10 +7,11 @@ import {
   Text,
   Keyboard,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import {Header} from '../../../Components/Header/Header';
 import styled from 'styled-components';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useScrollToTop} from '@react-navigation/native';
 import {visibleTabBar} from '../Main/MainScreen';
 import IconIonic from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
@@ -18,7 +19,8 @@ import {RenderUserMessage} from './MessageUserMessage';
 import {getChatById} from '../../../store/mail/chats_actions/chat_actions';
 import {shallowEqual, useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../../store/reducers/rootReduser';
-import {getMessages} from '../../../store/mail/message_actions/message_actions';
+import socketIoClient from "socket.io-client";
+import {getValueStorage} from '../../../storage/storage';
 
 const UserWrapper = styled(View)``;
 
@@ -69,6 +71,10 @@ const RemoveText = styled(Text)`
   padding: 8px 10px;
   font-size: 16px;
 `;
+
+const socket = socketIoClient("http://localhost:3000", { autoConnect: false });
+// const socket = socketIoClient("https://assistapp.club", { autoConnect: false });
+
 const Chat = ({route}: Props) => {
   const navigation = useNavigation();
   const {data} = route.params;
@@ -83,58 +89,110 @@ const Chat = ({route}: Props) => {
   });
   const [text, setText] = useState('');
   const [title, setTitle] = useState('');
+  const [typping, setTypping] = useState<boolean>(false);
   const [heightInput, setHeightInput] = useState(0);
   const [iconColor, setIconColor] = useState<boolean>(false);
   const [iconRemove, setIconRemove] = useState<boolean>(false);
-  // const [messages, setMessage] = useState<any>([]);
   const dispatch = useDispatch();
-
+ 
+ 
   const {loading, messages, errors} = useSelector(
     (state: RootState) => state.messages,
     shallowEqual,
   );
-  const {chat_data} = useSelector(
+  const {chat_id} = useSelector(
     (state: RootState) => state.chat_id,
     shallowEqual,
   );
-  const sendMessage = () => {
-    const mes = {
-      message: text,
-      chat_id: data,
-      user_id: '616407104da767ce25143cb7',
-    };
-    setText('');
-    if (text.length > 0) {
-      axios.post(`http://localhost:3000/chats/${data}`, {data: mes}).then();
-    }
-    getDataChat();
+  const [messagesArray, setMessages] = useState([]);
+  const sendMessageValue = () => {
+
+    getValueStorage('user_id').then(user_id => {
+      const mes = {
+        message: text,
+        chat_id: data,
+        user_id: user_id,
+      };
+
+      if (!text) return;
+
+      socket.emit("message", mes);
+      setText('');
+    });
+
+    // dispatch(sendMessage(mes));
+
+    // if (text.length > 0) {
+    //   axios.post(`http://localhost:3000/chats/${chat_id.chat._id}`, {data: mes}).then();
+    // }
+    // getDataChat();
+
   };
+  const addMessage = (msg: any) => {
+    // setMessages(msgs => [ ...msgs, msg ]);
+    // setMessage(oldMessages => [...oldMessages, msg]);
+    setMessages(oldMessages => [...oldMessages, ...(Array.isArray(msg) ? msg : [msg])]);
+  };
+
   const keyExtractor = (_item: any, index: any) => index;
 
   const getDataChat = useCallback(() => {
-    dispatch(getMessages(data));
+    // dispatch(getMessages(data));
     dispatch(getChatById(data));
-    setTitle(chat_data.user.fullName);
 
     setTimeout(() => {
-      flatListRef.current?.scrollToEnd({animated: true});
+      // flatListRef.current?.scrollToEnd({animated: true});
+      // setTitle(chat_id.user.fullName);
     }, 500);
-  }, [chat_data.user.fullName, data, dispatch]);
-  const removeMessagById = (id: string) => {
-    axios.delete(`http://localhost:3000/messages/${id}`).then();
-    getDataChat();
-  };
+  }, [ data, dispatch]);
+  // const removeMessagById = (id: string) => {
+  //   axios.delete(`http://localhost:3000/messages/${id}`).then();
+  //   getDataChat();
+  // };
 
   useEffect(() => {
-    getDataChat();
+  socket.connect();
+  // getDataChat();
+  dispatch(getChatById(data));
     Keyboard.addListener('keyboardDidShow', () => {
-      flatListRef.current?.scrollToEnd({animated: true});
+      // flatListRef.current?.scrollToEnd({animated: true});
     });
+    flatListRef.current?.scrollToEnd({animated: true});
     const unscribe = navigation.addListener('beforeRemove', () => {
+      socket.disconnect();
       visibleTabBar(true);
     });
+    
+    socket.on("latest", (data: any) => {
+      // expect server to send us the latest messages
+      addMessage(data);
+  });
+  socket.on("message", (data: any) => {
+    addMessage(data);
+    flatListRef.current?.scrollToEnd({animated: true});
+});
+  // socket.on("recieved_msg", (msg) => {
+  //   // console.log('recieved', msg)
+  //     addMessage(msg);
+  // });
+    // socket.on("send_msg", (msg) => {
+    //   addMessage(msg);
+    // });
+ 
+    socket.emit("latest", data);
+    getValueStorage('user_id').then(user_id => {
+      socket.emit("init", user_id);
+    });
+    // socket.on("latest", (data) => {
+    //   addMessage(data);
+    //   console.log('latest', data[0]);
+    // })
+    // socket.on('typping', () => {
+    //   setTypping(true);
+    // })
+
     return unscribe;
-  }, [navigation, getDataChat]);
+  }, [navigation, getChatById, dispatch]);
 
   return (
     <WrapperKeyboard behavior={'padding'} keyboardVerticalOffset={20}>
@@ -147,13 +205,14 @@ const Chat = ({route}: Props) => {
       <ChatWrapper
         showsVerticalScrollIndicator={false}
         ref={flatListRef}
-        data={messages}
+        data={messagesArray}
         keyExtractor={keyExtractor}
         renderItem={({item, index}) => {
           return (
-            <UserWrapper key={index}>
+            <UserWrapper>
               <RenderUserMessage
-                removeMessage={id => removeMessagById(id)}
+                key={index}
+                // removeMessage={id => removeMessagById(id)}
                 iconRemove={value => setIconRemove(value)}
                 id={item.user_id}
                 info={item}
@@ -162,18 +221,22 @@ const Chat = ({route}: Props) => {
           );
         }}
       />
+     {typping && <RemoveText>{'typing'}</RemoveText> }
       <InputWrapper>
         <IconWrapper>
           <IconI
             name={'add-circle-outline'}
             size={22}
-            onPress={() => sendMessage()}
+            onPress={sendMessageValue}
           />
         </IconWrapper>
         <Input
           height={heightInput}
           onContentSizeChange={event => {
             setHeightInput(event.nativeEvent.contentSize.height);
+          }}
+          onChange={() => {
+            socket.emit('typing')
           }}
           multiline
           placeholder={'Press type a message...'}
@@ -193,7 +256,7 @@ const Chat = ({route}: Props) => {
             color={iconColor}
             name={'arrow-forward-circle-outline'}
             size={22}
-            onPress={() => sendMessage()}
+            onPress={sendMessageValue}
           />
         </IconWrapper>
       </InputWrapper>

@@ -18,6 +18,7 @@ import {SearchUsrModalize} from './Modalize';
 import {subscribeRequest} from '../../../store/actions/activitesActions/activitesActions';
 import {fetchUserById} from '../../../store/actions/userByIdActions/userByIdActions';
 import {visibleTabBar} from '../Main/MainScreen';
+import { createChat } from '../../../network/api_request';
 // import { joinRoom } from '../../../network/socket';
 // import {socketFollow} from '../../../network/socket';
 
@@ -142,6 +143,7 @@ const SearchUser = ({route}: Props) => {
     socket();
   };
   const startMessaging = () => {
+    createChat(id._id);
     navigation.navigate('GoChat', {userName: id.fullName, data: data});
     visibleTabBar(false);
   };

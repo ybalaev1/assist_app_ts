@@ -141,7 +141,7 @@ const AuthScreen = () => {
         />
       </InputWrapper>
 
-      <Button onPress={() => authorizateUser()}>
+      <Button onPress={authorizateUser}>
         <TextDef>{'Log in'}</TextDef>
       </Button>
       {check && (

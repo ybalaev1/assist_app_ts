@@ -10,11 +10,9 @@ const Wrapper = styled(TouchableOpacity)`
   background-color: ${props =>
     props.current ? props.theme.darkblue : props.theme.secondary};
   border: 0 solid black;
-  border-radius: 14px;
-  border-bottom-left-radius: ${props => (props.current ? '14px' : '4px')};
-  border-top-right-radius: ${props => (props.current ? '14px' : '6px')};
-  border-top-left-radius: ${props => (props.current ? '4px' : '14px')};
-  border-bottom-right-radius: ${props => (props.current ? '4px' : '14px')};
+  border-radius: 12px;
+  border-bottom-left-radius: ${props => (props.current ? '12px' : '4px')};
+  border-bottom-right-radius: ${props => (props.current ? '4px' : '12px')};
   margin-left: ${props => (props.current ? '20px' : '14px')};
   margin-right: 14px;
   margin-top: 6px;
@@ -55,7 +53,7 @@ const IconRight = styled(IconIonic)`
 type Props = {
   id: string;
   info: any;
-  removeMessage: (id: string) => void;
+  removeMessage?: (id: string) => void;
   iconRemove: (value: boolean) => void;
 };
 const RenderUserMessage = ({id, info, removeMessage, iconRemove}: Props) => {
@@ -67,6 +65,7 @@ const RenderUserMessage = ({id, info, removeMessage, iconRemove}: Props) => {
         setMe(true);
       }
     });
+    // console.log( info + ":" +info.message);
   }, [id]);
   const handleRemove = (id_m: string) => {
     // Alert.alert('Remove message?', '', [

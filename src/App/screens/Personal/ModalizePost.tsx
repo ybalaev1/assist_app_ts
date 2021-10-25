@@ -1,5 +1,12 @@
 import React, {useEffect, useRef} from 'react';
-import {Dimensions, TouchableOpacity, Text, Switch, View, Share} from 'react-native';
+import {
+  Dimensions,
+  TouchableOpacity,
+  Text,
+  Switch,
+  View,
+  Share,
+} from 'react-native';
 
 import {Modalize} from 'react-native-modalize';
 import {useSelector} from 'react-redux';
@@ -100,7 +107,6 @@ const PostModalize = ({logout, handleClosed, name}: Props) => {
       }}
       modalTopOffset={deviceHeight / 3}
       HeaderComponent={renderHeader()}>
-
       <TouchIcon onPress={() => navigation.navigate('AppInfo')}>
         <TextDefault>{'App information'}</TextDefault>
         <IconI name={'code-working-outline'} size={22} />

@@ -12,6 +12,7 @@ import userByIdReducer from './userByIdReducer/userByIdReducer';
 import chatReducer from '../mail/reducers/chatReducer/chatReducer';
 import chatByIdReducer from '../mail/reducers/chatByIdReducer/chatByIdReducer';
 import messagesReducer from '../mail/reducers/messageReducer/messageReducer';
+import socketReducer from './socketReducer/socketReducer';
 
 const rootReducer = combineReducers({
   posts: postReducer,
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   chats: chatReducer,
   chat_id: chatByIdReducer,
   messages: messagesReducer,
+  // socket: socketReducer,
 });
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof rootReducer>;

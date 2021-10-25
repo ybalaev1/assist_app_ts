@@ -25,13 +25,15 @@ const registerUserService = (request: any) =>
     });
 
 const authorizationService = (request: any) =>
-  axios.post<AuthTokenUser[]>(api.auth, request).then((response: any) => {
+  axios.post(api.auth, request).then((response: any) => {
     setValueStorage('user_id', response.data.id).then();
     setValueStorage('tokenAuth', response.data.accessToken).then();
     return response.data;
   });
 
+
 export function* authorizationUser(payload: any) {
+  console.log(payload);
   try {
     const response: ReturnType<typeof authorizationService> = yield call(
       authorizationService,

@@ -13,7 +13,7 @@ import {fetchPersonalRequest} from '../../../store/actions/presonalActions/preso
 import {initWebSocket} from '../../../network/socket';
 import {visibleTabBar} from '../Main/MainScreen';
 import axios from 'axios';
-import { api } from '../../../network/api_request';
+import {api} from '../../../network/api_request';
 const Wrapper = styled(View)`
   flex: 1;
   padding: 30px 0;

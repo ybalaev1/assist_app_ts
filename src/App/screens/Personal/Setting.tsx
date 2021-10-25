@@ -5,7 +5,7 @@ import {getValueStorage, removeItem} from '../../../storage/storage';
 import styled from 'styled-components';
 import axios from 'axios';
 import {api} from '../../../network/api_request';
-import { useNavigation } from '@react-navigation/core';
+import {useNavigation} from '@react-navigation/core';
 
 const Wrapper = styled(View)`
   flex: 1;

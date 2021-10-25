@@ -7,10 +7,11 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "lint": "eslint .",
+    "lint": "tsc --noEmit && eslint --ext .js,.jsx,.ts,.tsx ./",
     "test": "jest --config=jest.config.js",
-    "format": "npx prettier --check 'src/**/*.tsx'",
-    "build-android": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release/"
+    "format": "npx prettier --write . && npx prettier --check 'src/**/*.tsx'",
+    "build-android": "npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/build/intermediates/res/merged/release/",
+    "prettier:write": "npx prettier --write **/*.{js,jsx,ts,tsx,json} && npx prettier --write *.{js,jsx,ts,tsx,json}"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.15.7",
@@ -21,7 +22,9 @@
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/stack": "^6.0.7",
     "@reduxjs/toolkit": "^1.6.1",
+    "@types/crypto-js": "^4.0.2",
     "@types/google-libphonenumber": "^7.4.21",
+    "@types/node": "^16.11.1",
     "@types/react-native-vector-icons": "^6.4.8",
     "@types/react-redux": "^7.1.18",
     "@types/redux-logger": "^3.0.9",

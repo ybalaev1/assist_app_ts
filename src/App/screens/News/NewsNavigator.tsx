@@ -3,7 +3,7 @@ import React from 'react';
 import {View} from 'react-native';
 import styled from 'styled-components';
 import {NewsParamList} from '../RootStackPrams';
-import { CreatedPost } from './CreatePost';
+import {CreatedPost} from './CreatePost';
 import {CrntPost} from './CurrentPost';
 import NewsScreen from './NewsScreen';
 

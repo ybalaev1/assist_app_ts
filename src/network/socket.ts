@@ -1,46 +1,49 @@
-import io, {Socket} from 'socket.io-client';
-const socket = io('http://localhost:8999');
-export const initWebSocket = () => {
-  socket.on('connect', () => {
-    console.log('socket.id');
-  });
+const EVENTS = {
+  CONNECT: 'connect',
+  DISCONNECT: 'disconnect',
+  MESSAGE: 'message'
 };
-export const joinRoom = (
-  roomName: string,
-  goScreen: {(data: any): void; (arg0: any): void},
-) => {
-  socket.emit('join', roomName);
-  socket.on('joined', (name: string) => {
-    goScreen(name);
-  });
-};
+import socketIoClient from "socket.io-client";
+const socket = socketIoClient("http://localhost:8999", { autoConnect: false });
 
-export const getDataUserOrChat = (getData: {
-  (data: any): void;
-  (arg0: any): void;
-}) => {
-  socket.on('usr_chat_id', (data: string[]) => {
-    return getData(data);
-  });
-};
+export default class Socket {
+  public user: string;
+  public port: string;
+  private onChange: (isConnected: boolean) => void;
+  private onMessage: (message: { message: string, chat_id: string }) => void;
+  private socket: any;
 
-export const socketFollow = (
-  id: string,
-  updateUser: {(data: any): void; (arg0: any): void},
-) => {
-  console.log(id);
-  socket.emit('user_id', id);
-  return socket.on('user_id', (data: any) => {
-    return updateUser(data);
-  });
-  //   socket.on('chat message', (data: any) => {
-  //         console.log(data);
-  //       });
-  //   socket.on('users', (data: any) => {
-  //     console.log(data);
-  //   });
-  //   socket.on('users', socket => {
-  //     // socket.join(id);
-  //     socket.in('room-' + id).emit('connectToRoom', 'You are in room no. ' + id);
-  //   });
-};
+  constructor(onChange: (isConnected: boolean) => void, onMessage: (message: { message: string, chat_id: string }) => void) {
+    this.onChange = onChange;
+    this.onMessage = onMessage;
+    this.socket = '';
+    this.user = '';
+    this.port = '';
+  }
+
+  public connect = (user: string, port: string) => {
+    this.user = user;
+    this.port = port;
+
+    // const host = `http://192.168.0.220:${port}`; // Running from local network
+    // this.socket = io.connect(host);
+    this.socket = socket.connect(); // Running from Heroku
+
+    this.socket.on(EVENTS.CONNECT, this.onConnected);
+  };
+
+  public onConnected = () => {
+    this.socket.on(EVENTS.MESSAGE, this.onMessage);
+    this.onChange(true);
+  };
+
+  public sendMessage = (message: { message: string, chat_id: string }) => {
+    if (typeof this.socket.emit === 'function') {
+      this.socket.emit(EVENTS.MESSAGE, message)
+    } else {
+      console.error('Cannot emit socket messages. Socket.io not connected.');
+    }
+  };
+
+  public disconnect = () => this.socket.close();
+}

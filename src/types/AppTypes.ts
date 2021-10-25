@@ -4,7 +4,7 @@ export type React$Node = JSX.Element | null;
 export type localStorageType = {
   key: string;
   value: string;
-  user_id: string;
+  chat_id: string;
   tokenAuth: string[];
   header_auth: string;
 };

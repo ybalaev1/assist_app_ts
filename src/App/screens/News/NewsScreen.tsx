@@ -8,7 +8,7 @@ import styled from 'styled-components';
 import {Dispatch} from 'redux';
 import {Loading} from './LoadingComponent';
 import {Header} from '../../../Components/Header/Header';
-import { useNavigation } from '@react-navigation/core';
+import {useNavigation} from '@react-navigation/core';
 
 const Wrapper = styled(View)`
   flex: 1;

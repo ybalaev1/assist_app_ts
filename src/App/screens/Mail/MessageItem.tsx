@@ -112,7 +112,7 @@ const MessItem = ({chat}: Props) => {
   );
   const [chatData, setChat] = useState(chat_data);
   // const getChat = useCallback(() => {
-    // dispatch(getChatById(chat._id));
+  // dispatch(getChatById(chat._id));
   //   console.log(chat_data);
   // }, [dispatch, chat._id]);
 

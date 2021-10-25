@@ -2,16 +2,10 @@ import React, {useState} from 'react';
 import {Image, Text, View} from 'react-native';
 import {getDateString} from '../../storage/middleware';
 import styled from 'styled-components';
-import {shallowEqual, useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../store/reducers/rootReduser';
 import IconIonic from 'react-native-vector-icons/Fontisto';
 import {TouchableOpacity} from 'react-native';
 import ImageView from 'react-native-image-viewing';
-import {useEffect} from 'react';
-import {Dispatch} from 'redux';
-import {fetchPersonalRequest} from '../../store/actions/presonalActions/presonalActions';
 import {useNavigation} from '@react-navigation/native';
-import { TouchableHighlight } from 'react-native-gesture-handler';
 
 const UserWrapper = styled(TouchableOpacity)`
   flex-direction: row;
@@ -153,7 +147,7 @@ const PostItem = ({post, pending, openModal}: Props) => {
 
   return (
     <WrapperItem
-    onPress={() => navigation.navigate('CrntPost', {post_id: post})}>
+      onPress={() => navigation.navigate('CrntPost', {post_id: post})}>
       <ImageView
         imageIndex={0}
         images={images}

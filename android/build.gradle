@@ -21,7 +21,6 @@ buildscript {
         versionName = getMyVersionName()
         versionCode = getMyVersionCode()
      }
-    }
     repositories {
         google()
         mavenCentral()

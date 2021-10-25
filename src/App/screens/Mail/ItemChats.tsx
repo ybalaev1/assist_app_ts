@@ -79,7 +79,7 @@ const CrntItem = ({chat}: ItemProps) => {
       setData(response.data.data);
       setLoading(false);
     });
-    console.log(data);
+    // console.log(chat);
   }, [chat._id]);
 
   const Icon = styled(IconIonic)`
@@ -121,7 +121,7 @@ const CrntItem = ({chat}: ItemProps) => {
                 <WrapperName>
                   <UserName>{data.user.fullName}</UserName>
                   {/* <LatestWrapper>
-                    <LastMessageName>{data.last_user}</LastMessageName>
+                    <LastMessageName>{data.chat.last_user}</LastMessageName>
                     <LatestWrapper>
                       <LastMessage>
                         {data.latestMessage.toString().length > 24

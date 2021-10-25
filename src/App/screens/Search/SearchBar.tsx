@@ -43,7 +43,7 @@ const SearchBar = ({users, filtered, initialUsers}: Props) => {
     <Wrapper>
       <IconI name={'search-outline'} size={18} />
       <WrapperInput
-      editable={false}
+        editable={false}
         value={searchValue}
         onKeyPress={ev => {
           if (
