@@ -8,12 +8,12 @@ const TARGET_ENV = TARGET;
 //   news: TARGET_ENV === 'DEV' ? API_LOCAL + 'news' : API_HOST + 'news',
 //   chats: TARGET_ENV === 'DEV' ? API_LOCAL + 'chats/' : API_HOST + 'chats',
 // };
-const api = {
-  auth: API_HOST + 'auth',
-  users: API_HOST + 'users',
-  news: API_HOST + 'news',
-  chats: API_HOST + 'chats/',
-};
+// // const api = {
+// //   auth: API_HOST + 'auth',
+// //   users: API_HOST + 'users',
+// //   news: API_HOST + 'news',
+// //   chats: API_HOST + 'chats/',
+// // };
 export {api};
 
 export const createChat = (costumer: string) => {

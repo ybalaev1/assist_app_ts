@@ -9,6 +9,7 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import IconIonic from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import {api} from '../../../network/api_request';
+
 const UserWrapper = styled(View)`
   flex-direction: row;
 `;
@@ -21,6 +22,7 @@ const WrapperName = styled(View)`
 `;
 const LatestWrapper = styled(View)`
   flex-direction: row;
+  justify-content: space-between;
 `;
 const UserImage = styled(Image)`
   width: 50px;
@@ -62,7 +64,6 @@ const CrntItem = ({chat}: ItemProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const navigation = useNavigation();
   const WrapperItem = styled(TouchableOpacity)`
-    flex: 1;
     padding: 14px 10px;
     background-color: ${props => props.theme.white};
     border: 0px solid black;
@@ -79,7 +80,6 @@ const CrntItem = ({chat}: ItemProps) => {
       setData(response.data.data);
       setLoading(false);
     });
-    // console.log(chat);
   }, [chat._id]);
 
   const Icon = styled(IconIonic)`
@@ -97,7 +97,7 @@ const CrntItem = ({chat}: ItemProps) => {
   };
   const handlePressChat = () => {
     visibleTabBar(false);
-    navigation.navigate('Message', {data: chat._id});
+    navigation.navigate('Message', {data: chat});
   };
 
   return (
@@ -120,9 +120,8 @@ const CrntItem = ({chat}: ItemProps) => {
                 />
                 <WrapperName>
                   <UserName>{data.user.fullName}</UserName>
-                  {/* <LatestWrapper>
-                    <LastMessageName>{data.chat.last_user}</LastMessageName>
                     <LatestWrapper>
+                      <LastMessageName>{data.chat.last_user}</LastMessageName>
                       <LastMessage>
                         {data.latestMessage.toString().length > 24
                           ? `${data.latestMessage
@@ -132,10 +131,9 @@ const CrntItem = ({chat}: ItemProps) => {
                           : data.latestMessage}
                       </LastMessage>
                       <LastMessageTime>
-                        {getTime(Date.parse(data.updatedAt))}
+                        {getTime(Date.parse(data.chat.updatedAt))}
                       </LastMessageTime>
                     </LatestWrapper>
-                  </LatestWrapper> */}
                 </WrapperName>
               </UserWrapper>
             </HeadWrapper>

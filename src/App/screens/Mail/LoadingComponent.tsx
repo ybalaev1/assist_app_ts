@@ -22,7 +22,7 @@ const Loading = () => {
         height={100}
         width={100}
         scale={0.95}
-        delay={0}
+        delay={100}
         d={d}
       />
     </WrapperCentered>

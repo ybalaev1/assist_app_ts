@@ -72,24 +72,21 @@ const RemoveText = styled(Text)`
   font-size: 16px;
 `;
 
-// const socket = socketIoClient("http://localhost:3000", { autoConnect: false });
-const socket = socketIoClient("https://assistapp.club", { autoConnect: false });
+const socket = socketIoClient("http://localhost:3000", { autoConnect: false });
+// const socket = socketIoClient("https://assistapp.club", { autoConnect: false });
 
 const Chat = ({route}: Props) => {
   const navigation = useNavigation();
   const {data} = route.params;
   const onHandleBack = () => {
+    socket.disconnect();
     navigation.goBack();
     visibleTabBar(true);
   };
-  const flatListRef = useRef({
-    x: 0,
-    y: 0,
-    animated: true,
-  });
+  const flatListRef = useRef(null);
   const [text, setText] = useState('');
   const [title, setTitle] = useState('');
-  const [typping, setTypping] = useState<boolean>(false);
+  const [typing, setTypping] = useState<any>('');
   const [heightInput, setHeightInput] = useState(0);
   const [iconColor, setIconColor] = useState<boolean>(false);
   const [iconRemove, setIconRemove] = useState<boolean>(false);
@@ -110,7 +107,7 @@ const Chat = ({route}: Props) => {
     getValueStorage('user_id').then(user_id => {
       const mes = {
         message: text,
-        chat_id: data,
+        chat_id: data._id,
         user_id: user_id,
       };
 
@@ -132,19 +129,19 @@ const Chat = ({route}: Props) => {
     // setMessages(msgs => [ ...msgs, msg ]);
     // setMessage(oldMessages => [...oldMessages, msg]);
     setMessages(oldMessages => [...oldMessages, ...(Array.isArray(msg) ? msg : [msg])]);
+    flatListRef.current?.scrollToEnd({animated: true});
   };
 
   const keyExtractor = (_item: any, index: any) => index;
 
-  const getDataChat = useCallback(() => {
-    // dispatch(getMessages(data));
-    dispatch(getChatById(data));
-
-    setTimeout(() => {
-      // flatListRef.current?.scrollToEnd({animated: true});
-      // setTitle(chat_id.user.fullName);
-    }, 500);
-  }, [ data, dispatch]);
+  // const getDataChat = useCallback(() => {
+  //   // dispatch(getMessages(data));
+  //   // dispatch(getChatById(data));
+  //   setTimeout(() => {
+  //     flatListRef.current?.scrollToEnd({animated: true});
+  //     // setTitle(chat_id.user.fullName);
+  //   }, 500);
+  // }, [ data, dispatch]);
   // const removeMessagById = (id: string) => {
   //   axios.delete(`http://localhost:3000/messages/${id}`).then();
   //   getDataChat();
@@ -152,24 +149,34 @@ const Chat = ({route}: Props) => {
 
   useEffect(() => {
   socket.connect();
-  // getDataChat();
-  dispatch(getChatById(data));
+  socket.emit("latest", data._id);
+
+  getValueStorage('user_id').then(user_id => {
+    socket.emit("init", user_id);
+  });
+  dispatch(getChatById(data._id));
     Keyboard.addListener('keyboardDidShow', () => {
-      // flatListRef.current?.scrollToEnd({animated: true});
+      flatListRef.current?.scrollToEnd({animated: true});
+      onHandleTyping();
     });
-    flatListRef.current?.scrollToEnd({animated: true});
+    Keyboard.addListener('keyboardDidHide', () => {
+      socket.emit('notyping');
+    });
     const unscribe = navigation.addListener('beforeRemove', () => {
-      socket.disconnect();
       visibleTabBar(true);
     });
-    
-    socket.on("latest", (data: any) => {
+    setTimeout(() => {
+    //   flatListRef.current?.scrollToEnd({animated: true});
+      if (chat_id && chat_id.user) {
+        setTitle(chat_id.user.fullName);
+      }
+    }, 2500);
+    socket.on("latest", (conversation: any) => {
       // expect server to send us the latest messages
-      addMessage(data);
+      addMessage(conversation);
   });
-  socket.on("message", (data: any) => {
-    addMessage(data);
-    flatListRef.current?.scrollToEnd({animated: true});
+  socket.on("message", (message: any) => {
+    addMessage(message);
 });
   // socket.on("recieved_msg", (msg) => {
   //   // console.log('recieved', msg)
@@ -179,30 +186,38 @@ const Chat = ({route}: Props) => {
     //   addMessage(msg);
     // });
  
-    socket.emit("latest", data);
-    getValueStorage('user_id').then(user_id => {
-      socket.emit("init", user_id);
-    });
     // socket.on("latest", (data) => {
     //   addMessage(data);
     //   console.log('latest', data[0]);
     // })
-    // socket.on('typping', () => {
-    //   setTypping(true);
-    // })
+    socket.on('typing', (typing: any) => {
+      getValueStorage('user_id').then((user) => {
+        if (user === typing.user_id) {
+          setTypping('');
+        }
+        else setTypping(typing)
+      });
+    });
 
     return unscribe;
   }, [navigation, getChatById, dispatch]);
 
+  const onHandleTyping = () => {
+    getValueStorage('user_id').then((user) => {
+      socket.emit('typing', user);
+    });
+  }
   return (
     <WrapperKeyboard behavior={'padding'} keyboardVerticalOffset={20}>
       <Header
-        title={title}
+        title={title ? title : 'Loading...'}
         pressL={onHandleBack}
         leftIcon={'chevron-back'}
         rightIcon={'ellipsis-horizontal'}
       />
       <ChatWrapper
+      onContentSizeChange={() => flatListRef.current?.scrollToEnd({animated: true})}
+      onLayout={() => flatListRef.current?.scrollToEnd({animated: true})}
         showsVerticalScrollIndicator={false}
         ref={flatListRef}
         data={messagesArray}
@@ -221,7 +236,7 @@ const Chat = ({route}: Props) => {
           );
         }}
       />
-     {typping && <RemoveText>{'typing'}</RemoveText> }
+     {typing.message && <RemoveText>{typing.message}</RemoveText> }
       <InputWrapper>
         <IconWrapper>
           <IconI
@@ -235,14 +250,13 @@ const Chat = ({route}: Props) => {
           onContentSizeChange={event => {
             setHeightInput(event.nativeEvent.contentSize.height);
           }}
-          onChange={() => {
-            socket.emit('typing')
-          }}
+          // onChange={() => onHandleTyping}
           multiline
           placeholder={'Press type a message...'}
           value={text}
           onChangeText={value => {
             setText(value);
+            onHandleTyping();
             if (value.length) {
               setIconColor(false);
             } else {

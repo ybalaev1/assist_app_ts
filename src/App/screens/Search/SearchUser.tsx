@@ -140,17 +140,13 @@ const SearchUser = ({route}: Props) => {
       id_follow: personal._id,
     };
     // subscribeRequest()
-    socket();
   };
   const startMessaging = () => {
-    createChat(id._id);
-    navigation.navigate('GoChat', {userName: id.fullName, data: data});
+    // createChat(id._id);
+    navigation.navigate('GoChat', {userName: id.fullName, data: id._id});
     visibleTabBar(false);
   };
-
-  const socket = () => {
-    const roomName = personal._id + ' ' + id._id;
-  };
+  
   const keyExtractor = (_item: any, index: any) => index;
   const headerComponent = () => {
     return (

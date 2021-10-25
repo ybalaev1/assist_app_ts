@@ -15,10 +15,14 @@ export default (state = initialState, action: ChatsActions) => {
         loading: true,
       };
     case chatsTypes.CHATS_REQUEST_SUCCESS:
+      const chats = action.payload.chats;
+      const filter = chats.sort((a: {updatedAt: string}, b: {updatedAt: string}) => {
+        return Date.parse(b.updatedAt) - Date.parse(a.updatedAt);
+      })
       return {
         ...state,
         loading: false,
-        chats: action.payload.chats,
+        chats: filter,
         errors: null,
       };
     case chatsTypes.CHATS_REQUEST_FAILTURE:
