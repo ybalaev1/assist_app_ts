@@ -72,8 +72,8 @@ const RemoveText = styled(Text)`
   font-size: 16px;
 `;
 
-const socket = socketIoClient("http://localhost:3000", { autoConnect: false });
-// const socket = socketIoClient("https://assistapp.club", { autoConnect: false });
+// const socket = socketIoClient("http://localhost:3000", { autoConnect: false });
+const socket = socketIoClient("https://assistapp.club", { autoConnect: false });
 
 const Chat = ({route}: Props) => {
   const navigation = useNavigation();
